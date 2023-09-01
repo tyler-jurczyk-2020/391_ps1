@@ -135,10 +135,11 @@ continue4:
   addl $1, %ebx 
   movl %ebx, %eax
   jmp exit
-# If (insert delete <= replace)
+# If (delete <= replace)
 next:
-  movl -8(%ebp), %esi
-  cmp %esi, %ebx
+  movl -8(%ebp), %ebx
+  movl -12(%ebp), %esi
+  cmp %ebx, %esi
   jb next_next
   addl $1, %esi
   movl %esi, %eax
