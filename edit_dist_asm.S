@@ -43,7 +43,7 @@
 # Registers:
 #   EAX - Return Value
 #   EBX - root1
-#   BSI - root2
+#   ESI - root2
 #   you may choose how to store your local/temp variables
 #
 
@@ -56,40 +56,42 @@ edit_dist_asm:
   addl $-12, %esp 
   # Save callee-modified Registers
   pushl %ebx
-  pushl %bsi
-  # if (root1 == NULL and root2 == NULL)
+  pushl %esi
+  # If (root1 == NULL and root2 == NULL)
   movl %ebx, %eax
-  orl %bsi, %eax 
+  orl %esi, %eax 
   cmp $0, %eax
   jnz continue1
   movl $0, %eax  
   jmp exit
-# if (root1 == NULL)
+# If (root1 == NULL)
 continue1:
   cmp $0, %ebx
   jnz continue2
   # Call recursively
-  movl NEXT(%bsi), %bsi
+  movl NEXT(%esi), %esi
   call edit_dist_asm
   # On Return
   addl $1, %eax
   jmp exit
-# if (root2 == NULL)
+# If (root2 == NULL)
 continue2:
-  cmp $0, %bsi
+  cmp $0, %esi
   jnz continue3
   # Call recursively
-  movl NEXT(%bsi), %bsi
+  movl NEXT(%esi), %esi
   call edit_dist_asm
   # On Return
   addl $1, %eax
   jmp exit
-# if (root1->val == root2->val)
+# If (root1->val == root2->val)
 continue3:
-  cmp VAL(%ebx), VAL(%bsi) #NOT VALID ASM
+  movl VAL(%ebx), %ebx
+  movl VAL(%esi), %esi
+  cmp %ebx, %esi
   jnz continue4
   # Call recursively
-  movl NEXT(%bsi), %bsi
+  movl NEXT(%esi), %esi
   movl NEXT(%ebx), %ebx
   call edit_dist_asm
   # On Return
@@ -100,42 +102,42 @@ continue4:
   call edit_dist_asm
   movl %eax, -4(%ebp)
 # Set delete
-  movl NEXT(%bsi), %bsi
+  movl NEXT(%esi), %esi
   call edit_dist_asm
   movl %eax, -8(%ebp)
 # Set replace (Note that root1->next and root2->next already set above)
   call edit_dist_asm
   movl %eax, -12(%bp)
-# if (insert <= delete && insert <= replace)
+# If (insert <= delete && insert <= replace)
   movl -4(%ebp), %ebx
-  movl -8(%ebp), %bsi
-  cmp %ebx, %bsi
+  movl -8(%ebp), %esi
+  cmp %ebx, %esi
   jb next
-  movl -12(%ebp), %bsi
-  cmp %ebx, %bsi
+  movl -12(%ebp), %esi
+  cmp %ebx, %esi
   jb next
   addl $1, %ebx 
   movl %ebx, %eax
   jmp exit
-# if (insert delete <= replace)
+# If (insert delete <= replace)
 next:
-  movl -8(%ebp), %bsi
-  cmp %bsi, %ebx
+  movl -8(%ebp), %esi
+  cmp %esi, %ebx
   jb next_next
-  addl $1, %bsi
-  movl %bsi, %eax
+  addl $1, %esi
+  movl %esi, %eax
   jmp exit
-# return 1 + replace
+# Return 1 + replace
 next_next:
   movl -12(%ebp), %eax 
-  addl $1, $eax
+  addl $1, %eax
   jmp exit
 
 
   # --- STUDENT CODE ENDS HERE ---
 exit:
   # Restore callee-modified registers
-  popl %bsi
+  popl %esi
   popl %ebx
   leave
   ret
