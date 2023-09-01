@@ -51,6 +51,9 @@ edit_dist_asm:
   pushl %ebp
   movl %esp, %ebp
 
+  # EBX and ESI
+  movl 8(%ebp), %ebx
+  movl 12(%ebp), %esi
   # --- STUDENT CODE STARTS HERE ---
   # Allocate space for insert, delete, and replace
   addl $-12, %esp 
