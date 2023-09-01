@@ -95,6 +95,8 @@ continue3:
   movl VAL(%ebx), %ebx
   movl VAL(%esi), %esi
   cmp %ebx, %esi
+  movl 8(%ebp), %ebx
+  movl 12(%ebp), %esi
   jnz continue4
   # Call recursively
   pushl NEXT(%esi)
@@ -121,7 +123,7 @@ continue4:
   pushl NEXT(%ebx)
   call edit_dist_asm
   addl $8, %esp
-  movl %eax, -12(%bp)
+  movl %eax, -12(%ebp)
 # If (insert <= delete && insert <= replace)
   movl -4(%ebp), %ebx
   movl -8(%ebp), %esi
