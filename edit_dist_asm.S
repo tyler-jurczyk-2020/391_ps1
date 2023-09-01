@@ -142,7 +142,7 @@ next:
   cmp %ebx, %esi
   jb next_next
   addl $1, %ebx
-  movl %esi, %eax
+  movl %ebx, %eax
   jmp exit
 # Return 1 + replace
 next_next:
