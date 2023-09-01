@@ -50,16 +50,15 @@
 edit_dist_asm:
   pushl %ebp
   movl %esp, %ebp
-
+# Save callee-modified Registers
+  pushl %ebx
+  pushl %esi
   # EBX and ESI
   movl 8(%ebp), %ebx
   movl 12(%ebp), %esi
   # --- STUDENT CODE STARTS HERE ---
   # Allocate space for insert, delete, and replace
   addl $-12, %esp 
-  # Save callee-modified Registers
-  pushl %ebx
-  pushl %esi
   # If (root1 == NULL and root2 == NULL)
   movl %ebx, %eax
   orl %esi, %eax 
@@ -72,9 +71,11 @@ continue1:
   cmp $0, %ebx
   jnz continue2
   # Call recursively
-  movl NEXT(%esi), %esi
+  pushl NEXT(%esi)
+  pushl %ebx
   call edit_dist_asm
   # On Return
+  addl $8, %esp
   addl $1, %eax
   jmp exit
 # If (root2 == NULL)
@@ -82,9 +83,11 @@ continue2:
   cmp $0, %esi
   jnz continue3
   # Call recursively
-  movl NEXT(%esi), %esi
+  pushl %esi
+  pushl NEXT(%ebx)
   call edit_dist_asm
   # On Return
+  addl $8, %esp
   addl $1, %eax
   jmp exit
 # If (root1->val == root2->val)
@@ -94,22 +97,30 @@ continue3:
   cmp %ebx, %esi
   jnz continue4
   # Call recursively
-  movl NEXT(%esi), %esi
-  movl NEXT(%ebx), %ebx
+  pushl NEXT(%esi)
+  pushl NEXT(%ebx)
   call edit_dist_asm
   # On Return
+  addl $8, %esp
   jmp exit
 continue4:
 # Set insert
-  movl NEXT(%ebx), %ebx
+  pushl %esi
+  pushl NEXT(%ebx)
   call edit_dist_asm
+  addl $8, %esp
   movl %eax, -4(%ebp)
 # Set delete
-  movl NEXT(%esi), %esi
+  pushl NEXT(%esi)
+  pushl %ebx
   call edit_dist_asm
+  addl $8, %esp
   movl %eax, -8(%ebp)
 # Set replace (Note that root1->next and root2->next already set above)
+  pushl NEXT(%esi)
+  pushl NEXT(%ebx)
   call edit_dist_asm
+  addl $8, %esp
   movl %eax, -12(%bp)
 # If (insert <= delete && insert <= replace)
   movl -4(%ebp), %ebx
