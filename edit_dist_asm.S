@@ -50,6 +50,8 @@
 edit_dist_asm:
   pushl %ebp
   movl %esp, %ebp
+# Allocate space for insert, delete, and replace
+  addl $-12, %esp 
 # Save callee-modified Registers
   pushl %ebx
   pushl %esi
@@ -57,8 +59,6 @@ edit_dist_asm:
   movl 8(%ebp), %ebx
   movl 12(%ebp), %esi
   # --- STUDENT CODE STARTS HERE ---
-  # Allocate space for insert, delete, and replace
-  addl $-12, %esp 
   # If (root1 == NULL and root2 == NULL)
   movl %ebx, %eax
   orl %esi, %eax 
