@@ -53,7 +53,7 @@ edit_dist_asm:
 
   # --- STUDENT CODE STARTS HERE ---
   # Allocate space for insert, delete, and replace
-  movl $-12, %esp 
+  addl $-12, %esp 
   # Save callee-modified Registers
   pushl %ebx
   pushl %bsi
@@ -76,10 +76,10 @@ continue1:
   jmp exit
 # if (root2 == NULL)
 continue2:
-  cmp $0, %ebx
+  cmp $0, %bsi
   jnz continue3
   # Call recursively
-  movl NEXT(%ebx), %ebx
+  movl NEXT(%bsi), %bsi
   call edit_dist_asm
   # On Return
   addl $1, %eax
@@ -91,6 +91,7 @@ continue3:
   # Call recursively
   movl NEXT(%bsi), %bsi
   movl NEXT(%ebx), %ebx
+  call edit_dist_asm
   # On Return
   jmp exit
 continue4:
@@ -109,6 +110,27 @@ continue4:
   movl -4(%ebp), %ebx
   movl -8(%ebp), %bsi
   cmp %ebx, %bsi
+  jb next
+  movl -12(%ebp), %bsi
+  cmp %ebx, %bsi
+  jb next
+  addl $1, %ebx 
+  movl %ebx, %eax
+  jmp exit
+# if (insert delete <= replace)
+next:
+  movl -8(%ebp), %bsi
+  cmp %bsi, %ebx
+  jb next_next
+  addl $1, %bsi
+  movl %bsi, %eax
+  jmp exit
+# return 1 + replace
+next_next:
+  movl -12(%ebp), %eax 
+  addl $1, $eax
+  jmp exit
+
 
   # --- STUDENT CODE ENDS HERE ---
 exit:
