@@ -141,7 +141,7 @@ next:
   movl -12(%ebp), %esi
   cmp %ebx, %esi
   jb next_next
-  addl $1, %esi
+  addl $1, %ebx
   movl %esi, %eax
   jmp exit
 # Return 1 + replace
